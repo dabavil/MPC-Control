@@ -32,7 +32,7 @@ The model uses two actuators - the steering angle, and the throttle / break. It 
 
 ### Reasoning behind the chosen N (timestep length) and dt (elapsed duration between timesteps) values, and previous values tried.
 
-In my submission I have settled for N=15 steps and dt=0.1 seconds between steps. 
+In my submission I have settled for N=10 steps and dt=0.1 seconds between steps. 
 
 The values were chosen empirically, after trying combinations in range [5,20] for N, and [0.05 - 0.5] for dt. 
 At the higher values of N, the model becomes computiationally intensive and led to errors / significant lag on my hardware setup. For the smaller N values, the model did not "see" far enough into the future to account for sharp turns, and kept leading the vehicle off track. 

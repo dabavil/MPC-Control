@@ -8,7 +8,11 @@
 using CppAD::AD;
 
 // TODO: Set the timestep length and duration
-const size_t N = 15;
+// I have experimented with several dT and N values, and established that prediction length between 1 and 2 seconds is ideal
+// 
+
+
+const size_t N = 10;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -25,15 +29,15 @@ const size_t N = 15;
 //Reference values for speed, epsi and v - what we're aiming to achieve
 const double cte_ref = 0;
 const double epsi_ref = 0;
-const double v_ref = 25;
+const double v_ref = 30;
 
 const double cte_w = 2;
 const double epsi_w = 20;
-const double v_w = 5000;
-const double steering_w = 100000;
+const double v_w = 4000;
+const double steering_w = 25000;
 const double throttle_w = 20;
 
-const double steering_delta_w = 0.01;
+const double steering_delta_w = 0.3;
 const double throttle_delta_w = 0.01;
 
 
