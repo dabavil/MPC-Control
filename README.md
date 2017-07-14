@@ -3,6 +3,46 @@ Self-Driving Car Engineer Nanodegree Program
 
 ---
 
+## Model Predictive Control Project
+
+
+###Description of the model, incl. the state, actuators and update equations.
+
+This controller uses a kinetic bicycle model. The model state contains 6 variables:
+
+'[x, y, psi, v, cte, epsi] => these represent vehicles x and y position, heading, velocity, cross-track-error, and orientation error respectively.'
+
+The above is a simplification vs a true dynamic model, in that it ignores effects like torque, tire / suspension dynamics, inertia, etc., but worked well for the task at hand and was much simpler to implement. 
+
+The update from time 't' to 't+1' happens for the state variables via the following equations. (Variables at time 't', unless indicated otherwise)
+
+'x[t+1] = x + v * cos(psi) * dt // where dt is delta t'
+'y[t+1] = y + v * sin(psi) * dt'
+'psi[t+1] = psi + v / Lf * delta * dt // where delta is steering angle and Lf the constant reflecting distance between car's front and its center of gravity (set empirically)'
+'v[t+1] = v + a * dt // where a is acceleration (throttle)'
+'cte[t+1] = f(x) - y + v * sin(epsi) * dt'
+'epsi[t+1] = psi - psiDes + v * delta / Lf * dt //where psiDes is the desired orientation at time t'
+
+The model uses two actuators - the steering angle, and the throttle / break. It also sets constraints on these controls to reflect car's physical limits: [-25, +25] degrees for the steering angle and [-1, +1] for the throttle (with -1 representing full breaking)
+
+###Reasoning behind the chosen N (timestep length) and dt (elapsed duration between timesteps) values, and previous values tried.
+
+In my submission I have settled for N=15 steps and dt = 0.1 seconds between steps. 
+The values were chosen empirically, after trying combinations in range [5,20] for N, and [0.05 - 0.5] for dt. 
+At the higher values of N, the model becomes computiationally intensive and led to errors / significant lag on my hardware setup. For the smaller N values, the model did not "see" far enough into the future to account for sharp turns, and kept leading the vehicle off track. 
+For dt, lower values also led to computational intensity and did not provide better results, and for values above 0.2 the model was not responsive enough to react to changing road situation. In the end, combination of N=15 and dt=0.1 led to stable result, considering 1.5 seconds of future path, with the added benefit of dt aligning perfectly to the artificial 0.1s latency that is baked into the model (discussed below).
+
+
+###Preprocessesing waypoints
+
+Before running the MPC procedure, the major pre-processing step included transforming waypoints from the map coordinates into vehicle coordinates, which substantially simplified all the subsequent calculations. This involved subtracting the vehicle x and y from the waypoints to place the vehicle at the origin, and rotating them as to reflect zero orientation 'psi'. The mathematical formulas are on lines 104-122 in the file 'main.cpp'.
+
+
+###Dealing with latency 
+
+The file 'main.cpp' is built to send control inputs to the simulator with latency of 100ms, on top of any actual system latency. I have dealt with this by projecting the vehicle state forward by the latency duration, and feeding this anticipated state to the MPC controler, instead of the actual state at 't' that could be used if no latency was involved. 
+
+
 ## Dependencies
 
 * cmake >= 3.5
